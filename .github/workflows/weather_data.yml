@@ -1,0 +1,35 @@
+name: Obtener Datos Meteorológicos
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Ejecuta diariamente a la medianoche
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install pandas requests psycopg2-binary
+
+    - name: Run the ETL script
+      run: python mi_proyecto_clima/weather_etl.py
+
+    - name: Commit CSV file
+      run: |
+        git config --local user.email "you@example.com"
+        git config --local user.name "Your Name"
+        git add datos_clima.csv
+        git commit -m "Update weather data CSV"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
